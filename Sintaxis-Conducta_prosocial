@@ -1,0 +1,274 @@
+# Librer?as
+library(GPArotation)
+library(readxl)#Leer excel
+library(psych) #Datos descriptivos y m?s
+library(dplyr) #Funci?n %>%
+library(lavaan)#AFC
+library(semTools)#Invarianza
+library(parameters)#n_factors
+library(semPlot)#graficos de aFC
+library(EFAtools)#omega Y AFE
+library(readxl)#leer
+library(MBESS)#intervalos de confianza del omega
+library(openxlsx)#Guardar
+library(MVN)#normalidad
+library(PerformanceAnalytics)#Grafico de las correlaciones
+library(haven)
+install.packages("n_factors")
+citation("")
+
+##----------------------------------------------------------------------------------------------------------
+#Colocar la ruta donde se exportar?n las hojas de c?lculo 
+
+setwd("F:/Psicologia/Asesorias/Proyectos con el profe Lincol")
+articulo <- read_sav("F:/Psicologia/Asesorias/Erika y Jhadira/articulo.sav")
+da=articulo
+##----------------------------------------------------------------------------------------------------------
+#Analisis factorial confirmatorio
+# 0) Modelo original (Caprara et al., 2005)
+Modelo0<-'F1=~ P1 + P3 + P4 + P6
+F2=~ P2 + P9 + P11 + P14
+F3=~ P7 + P10 + P13 + P15
+F4=~ P5 + P8 + P12 + P16'
+
+
+#Estimación
+fit.Modelo0<-cfa(model = Modelo0, data =da,estimator="WLSMV",ordered = TRUE) 
+
+#Path analisis
+semPaths(fit.Modelo0, what = "std", whatLabels="std",
+         style = "lisrel", layout = "tree3", 
+         intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+         rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+         edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+# Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo0, fit.subset)
+
+# 1) Modelo de Barrero-Toncel et al. (2023)
+Modelo1<-'F1=~ P1 + P3 + P4 + P6 + P7 + P13
+F2=~ P5 + P8 + P10 + P12 + P16
+F3=~ P2 + P9 + P14'
+
+#Estimación
+fit.Modelo1<-cfa(model = Modelo1, data =da,estimator="WLSMV",ordered = TRUE) 
+
+#Path analisis
+semPaths(fit.Modelo1, what = "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+# Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo1, fit.subset)
+
+# 2)Barrero-Toncel et al. (2023) modelo en bifactor
+Modelo2<-'F1=~ P1 + P3 + P4 + P6 + P7 + P13
+F2=~ P5 + P8 + P10 + P12 + P16
+F3=~ P2 + P9 + P14
+G=~ P1 + P3 + P4 + P6 + P7 + P13 + P5 + P8 + P10 + P12 + P16 + P2 + P9 + P14'
+
+#Estimación
+fit.Modelo2<-cfa(model = Modelo2, data =da,estimator="WLSMV",ordered = TRUE, orthogonal = TRUE, std.lv = TRUE) 
+
+#Path analisis
+semPaths(fit.Modelo2, what = "std", whatLabels="std",
+         style = "lisrel", layout = "tree3", 
+         intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+         rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+         edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+# Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo2, fit.subset)
+
+#3) Modelo de Luengo-Kanacri et al., 2021
+Modelo3<-'F1=~P1+P2+P3+P4+P6+P7+P9+P10+P11+P13+P14+P15
+F2=~P5+P8+P12+P16
+G=~P1+P2+P3+P4+P5+P6+P7+P8+P9+P10+P11+P12+P13+P14+P15+P16
+'
+
+#Estimación
+fit.Modelo3<-cfa(model = Modelo3, data =da,estimator="WLSMV",ordered = TRUE, orthogonal = TRUE, std.lv = TRUE) 
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+# Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo3, fit.subset)
+
+#Path analisis
+semPaths(fit.Modelo3, what = "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#4)  Modelo de Martí-Vilar et al. (2020)
+Modelo4<-'G=~ P3 + P5 + P6 + P7 + P8 + P13 + P15' 
+
+#Estimación
+fit.Modelo4<-cfa(model = Modelo4, data =da,estimator="WLSMV",ordered = TRUE)
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+# Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo4, fit.subset)
+
+#Path analisis
+semPaths(fit.Modelo4, what = "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", nDigits = 2, edge.label.cex = 1.2,label.prop=3.2)
+
+#5) Modelos de Mieres-Chacaltana et al. (2020)
+Modelo5<-'F1=~ P1 + P3 + P4 + P6
+F2=~ P2 + P9 + P11 + P14
+F3=~ P5 + P8 + P12 + P16
+F4=~ P7 + P10 + P13 + P15
+G=~P1 + P3 + P4 + P6 + P2 + P9 + P11 + P14 + P5 + P8 + P12 + P16 + P7 + P10 + P13 + P15'
+
+#Estimación
+fit.Modelo5<-cfa(model = Modelo5, data =da,estimator="WLSMV",ordered = TRUE, orthogonal = TRUE, std.lv = TRUE) 
+
+#Evaluación de los modelos
+fit.subset<-c("chisq.scaled", "pvalue.scaled",
+              "df.scaled","cfi.scaled", 
+              "tli.scaled", "rmsea.scaled",
+              "rmsea.ci.lower.scaled","rmsea.ci.upper.scaled","srmr","wrmr")
+
+#Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo5, fit.subset)
+
+
+#Path analisis
+semPaths(fit.Modelo5, what = "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#6) Modelo de Mieres-Chacaltana et al. (2020)
+Modelo6<-'F1=~P1+P3+P6+P7
+F2=~P2+P9+P11+P14
+F3=~P4+P10+P13+P15
+F4=~P5+P8+P12+P16
+FG=~P1+P3+P6+P7+P2+P9+P11+P14+P4+P10+P13+P15+P5+P8+P12+P16'
+
+#Estimación
+fit.Modelo6<-cfa(model = Modelo6, data =da,estimator="WLSMV",
+                 ordered = TRUE, orthogonal= TRUE, std.lv=TRUE) 
+
+#Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo6, fit.subset)
+#Path analisis
+semPaths(fit.Modelo6, what = "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#7) Martínez-Pampliega et al. (2018)
+Modelo7<-'G=~P1+P2+P3+P4+P5+P6+P7+P8+P9+P10+P11+P12+P13+P14+P15+P16'
+
+#Estimación
+fit.Modelo7<-cfa(model = Modelo7, data = da,  
+                      estimator="WLSMV", ordered = TRUE)
+
+#Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo7, fit.subset)
+
+#Path analisis
+semPaths(fit.Modelo7, "std", whatLabels="std",
+                style = "lisrel", layout = "tree3", 
+                intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+                rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+                edge.color ="black", edge.width = 1.5,nDigits = 2, 
+                edge.label.cex = 0.8,label.prop=3.2, bifactor=TRUE)
+
+#8) Modelo de Rodríguez et al. (2017)
+Modelo8<-'F1=~ P5 + P8 + P10  + P12
+F2=~ P3 + P4 + P6 + P7 + P9 + P13
+'
+#Estimación
+fit.Modelo8<-cfa(model = Modelo8, data =da,estimator="WLSMV",
+                 ordered = TRUE) 
+
+#Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo8, fit.subset)
+#Path analisis
+semPaths(fit.Modelo8, what = "std", whatLabels="std",
+         style = "lisrel", layout = "tree3", 
+         intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+         rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+         edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+#9) Modelo de Biagioli et al. (2016) 
+Modelo9<-'F1=~P3+P4+P6+P7+P10+P13
+F2=~P5+P8+P12
+F3=~P2+P9+P11+P14+P15
+FG =~ F1 + F2 + F3 
+'
+#Estimación
+fit.Modelo9<-cfa(model = Modelo9, data =da,orthogonal= TRUE, 
+                 estimator="WLSMV", ordered = TRUE, std.lv=TRUE) 
+
+#Extrayendo  indices de ajuste del modelo
+fitmeasures(fit.Modelo9, fit.subset)
+#Path analisis
+semPaths(fit.Modelo9, what = "std", whatLabels="std",
+         style = "lisrel", layout = "tree3", 
+         intercepts = FALSE, residuals = FALSE, thresholds = FALSE,
+         rotation = 1, sizeMan = 3,sizeLat = 8, shapeMan = "rectangle", shapeLat = "circle",
+         edge.color ="black", nDigits = 2, edge.label.cex = 0.8,label.prop=3.2)
+
+
+#---------------------------------------------------------------------------------------------------------------------
+fit.summary <- round(rbind(fitmeasures(fit.Modelo1, fit.subset),
+                           fitmeasures(fit.Modelo2, fit.subset),
+                           fitmeasures(fit.Modelo3, fit.subset),
+                           fitmeasures(fit.Modelo4, fit.subset),
+                           fitmeasures(fit.Modelo5, fit.subset),
+                           fitmeasures(fit.Modelo6, fit.subset),
+                           fitmeasures(fit.Modelo7, fit.subset),
+                           fitmeasures(fit.Modelo8, fit.subset),
+                           fitmeasures(fit.Modelo9, fit.subset)),3)
+
+rownames(fit.summary) <- c("Modelo 1", "Modelo 2","Modelo 3","Modelo 4","Modelo 5","Modelo 6","Modelo 7","Modelo 8","Modelo 9")
+colnames(fit.summary) <- c("χ²","p","gl","CFI","TLI","RMSEA","Lower","Upper","SRMR","WRMR")
+fit.summary
+
+#Guardar
+fit.summary <- as.data.frame(fit.summary)
+fit.summary
+write.xlsx(fit.summary,"Modelos6.xlsx",colNames=TRUE, rowNames=TRUE)
+
+
+
+MVN::mvn(da, mvnTest = "mardia")
